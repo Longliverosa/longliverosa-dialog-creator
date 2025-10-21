@@ -115,8 +115,8 @@
     {
         var guid = Guid.NewGuid();
         var path = Path.Combine(IWebHostEnvironment.WebRootPath, $"{guid.ToString()}.csv");
-        List<string> texts = [.. Trees.SelectMany<DialogTree, (DialogTree Tree, DialogText Text)>(tree => tree.Nodes.SelectMany<DialogNode, (DialogTree Tree, DialogText Text)>(node => node.Text.Select(text => (tree, text)))).Select(text => $"{text.Tree.Identifier}_{text.Text.Identifier},{text.Text.Text}")];
-        List<string> choices = [.. Trees.SelectMany<DialogTree, (DialogTree Tree, DialogChoice Choice)>(tree => tree.Nodes.SelectMany<DialogNode, (DialogTree Tree, DialogChoice Choice)>(node => node.Choices.Select(choice => (tree, choice)))).Select(choice => $"{choice.Tree.Identifier}_{choice.Choice.Identifier},{choice.Choice.Text}")];
+        List<string> texts = [.. Trees.SelectMany<DialogTree, (DialogTree Tree, DialogText Text)>(tree => tree.Nodes.SelectMany<DialogNode, (DialogTree Tree, DialogText Text)>(node => node.Text.Select(text => (tree, text)))).Select(text => $"{text.Tree.Identifier}_{text.Text.Identifier},\"{text.Text.Text}\"")];
+        List<string> choices = [.. Trees.SelectMany<DialogTree, (DialogTree Tree, DialogChoice Choice)>(tree => tree.Nodes.SelectMany<DialogNode, (DialogTree Tree, DialogChoice Choice)>(node => node.Choices.Select(choice => (tree, choice)))).Select(choice => $"{choice.Tree.Identifier}_{choice.Choice.Identifier},\"{choice.Choice.Text}\"")];
         File.WriteAllLines(path, ["keys,en", .. texts, .. choices]);
         NavigationManager.NavigateTo($"downloadcsv/{guid.ToString()}.csv", true);
     }
