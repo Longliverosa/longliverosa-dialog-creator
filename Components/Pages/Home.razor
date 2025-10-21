@@ -4,6 +4,7 @@
 @inject DialogService DialogService
 @inject IWebHostEnvironment IWebHostEnvironment
 @inject NavigationManager NavigationManager
+@inject Utilities Utilities
 
 @rendermode InteractiveServer
 
@@ -42,7 +43,7 @@
     }
 </style>
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Dialog Creator</PageTitle>
 <div style="margin: 2rem 0 2rem 2rem;padding-top:1rem;background:none">
 
     <RadzenStack Orientation="Orientation.Horizontal" Style="margin-bottom:2rem">
@@ -71,7 +72,12 @@
 @code {
     public List<DialogSpeaker> Speakers { get; set; } = new() { new() { Name = "Rosa" } };
 
-    public List<DialogTree> Trees { get; set; } = [new DialogTree() { Nodes = new List<DialogNode>() { new DialogNode() } }];
+    public List<DialogTree> Trees { get; set; } = [];
+
+    protected override void OnInitialized()
+    {
+        Trees = [new DialogTree(Utilities.GetRandomIdentifier()) { Nodes = new List<DialogNode>() { new(Utilities.GetRandomIdentifier()) } }];
+    }
 
     public void OpenSpeakerDialog()
     {
@@ -95,7 +101,7 @@
     , new() { CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
     }
 
-    public void AddNewTree() => Trees.Add(new());
+    public void AddNewTree() => Trees.Add(new(Utilities.GetRandomIdentifier()));
 
     public void Refresh() => StateHasChanged();
 
@@ -132,6 +138,29 @@
         Trees = JsonSerializer.Deserialize<List<DialogTree>>(File.ReadAllText(path))!;
         Speakers = Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => text.Speaker).ToHashSet().ToList();
         File.Delete(path);
+        ReadAllIdentifiers();
         StateHasChanged();
+    }
+
+    public void ReadAllIdentifiers()
+    {
+        var identifiers = new List<string>();
+        foreach (var tree in Trees)
+        {
+            identifiers.Add(tree.Identifier);
+            foreach (var node in tree.Nodes)
+            {
+                identifiers.Add(node.Identifier);
+                foreach (var text in node.Text)
+                {
+                    identifiers.Add(text.Identifier);
+                }
+                foreach (var choice in node.Choices)
+                {
+                    identifiers.Add(choice.Identifier);
+                }
+            }
+        }
+        Utilities.ExistingIdentifiers = identifiers;
     }
 }

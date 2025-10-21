@@ -1,9 +1,9 @@
 ﻿namespace DialogCreator.Utilities
 {
-    public static class Utilities
+    public class Utilities
     {
-        public static List<string> ExistingIdentifiers { get; set; } = [];
-        public static string GetRandomIdentifier()
+        public List<string> ExistingIdentifiers { get; set; } = [];
+        public string GetRandomIdentifier()
         {
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();

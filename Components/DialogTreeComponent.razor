@@ -1,6 +1,8 @@
 ﻿@using DialogCreator.Components.Pages
 @rendermode InteractiveServer
 
+@inject Utilities Utilities
+
 <RadzenStack Orientation="Orientation.Horizontal">
     <RadzenTextBox @bind-Value=Tree.Title Style="height:50px;width:400px;margin-bottom:-2rem;font-weight:bold;font-size:25px" TextStyle="TextStyle.H4" Placeholder="Title (Optional)" />
     <RadzenButton Icon="delete" Style="height:50px;width:50px" Click="@(() => { Home.Trees.Remove(Tree); Home.Refresh(); })" />
@@ -68,12 +70,12 @@
 
 
     public void AddNewText(DialogNode node)
-        => node.Text.Add(new() { Text = string.Empty, Speaker = Speakers.First() });
+        => node.Text.Add(new(Utilities.GetRandomIdentifier()) { Text = string.Empty, Speaker = Speakers.First() });
 
 
     public void AddNewChoice(DialogNode node)
-        => node.Choices.Add(new() { Text = string.Empty });
+        => node.Choices.Add(new(Utilities.GetRandomIdentifier()) { Text = string.Empty });
 
     public void AddNewNode()
-        => Tree.Nodes.Add(new());
+        => Tree.Nodes.Add(new(Utilities.GetRandomIdentifier()));
 }

@@ -1,4 +1,5 @@
 using DialogCreator.Components;
+using DialogCreator.Utilities;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddControllers();
+builder.Services.AddScoped<Utilities>();
 
 var app = builder.Build();
 

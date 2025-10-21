@@ -1,8 +1,8 @@
 ﻿namespace DialogCreator.Models
 {
-    public class DialogText
+    public class DialogText(string identifier)
     {
-        public string Identifier { get; set; } = Utilities.Utilities.GetRandomIdentifier();
+        public string Identifier { get; set; } = identifier;
         public string Text { get; set; } = string.Empty;
         public required DialogSpeaker Speaker { get; set; } 
     }
