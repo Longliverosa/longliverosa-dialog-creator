@@ -49,10 +49,11 @@ namespace DialogCreator.Controllers
                 }
 
                 var guid = Guid.NewGuid().ToString();
-                using var fileStream = System.IO.File.Create(Path.Combine(_webHostEnvironment.WebRootPath, $"{guid}.json"));
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, $"{guid}.json");
+                using var fileStream = System.IO.File.Create(filePath);
                 file.CopyTo(fileStream);
                 fileStream.Close();
-    
+
                 return Ok(new { Guid = guid });
             }
             catch (Exception ex)
