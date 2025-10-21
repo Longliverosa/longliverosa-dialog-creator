@@ -131,6 +131,7 @@
         var path = Path.Combine(IWebHostEnvironment.WebRootPath, $"{fileName}.json");
         Trees = JsonSerializer.Deserialize<List<DialogTree>>(File.ReadAllText(path))!;
         Speakers = Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => text.Speaker).ToHashSet().ToList();
+        File.Delete(path);
         StateHasChanged();
     }
 }

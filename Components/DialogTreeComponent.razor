@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 
 <RadzenStack Orientation="Orientation.Horizontal">
-    <RadzenTextBox @bind-Value=Tree.Title Style="height:50px;width:400px;margin-bottom:-2rem;font-weight:bold;font-size:25px" TextStyle="TextStyle.H4" Placeholder="Title" />
+    <RadzenTextBox @bind-Value=Tree.Title Style="height:50px;width:400px;margin-bottom:-2rem;font-weight:bold;font-size:25px" TextStyle="TextStyle.H4" Placeholder="Title (Optional)" />
     <RadzenButton Icon="delete" Style="height:50px;width:50px" Click="@(() => { Home.Trees.Remove(Tree); Home.Refresh(); })" />
 </RadzenStack>
 <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Style="overflow:auto">
@@ -10,12 +10,13 @@
     {
         <RadzenCard @key=node.Identifier Style="min-width:560px">
             <RadzenStack Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.End">
-                <RadzenText TextStyle="TextStyle.H4" Text="Text" />
+                <RadzenTextBox @bind-Value=node.Name Placeholder="Name (Optional)" />
                 <RadzenStack Gap="0" AlignItems="AlignItems.End">
                     <RadzenText Style="margin:0" TextStyle="TextStyle.Subtitle2" Text="Id:" />
                     <RadzenText TextStyle="TextStyle.Subtitle2" Text="@node.Identifier" />
                 </RadzenStack>
             </RadzenStack>
+                <RadzenText TextStyle="TextStyle.H4" Text="Text" />
             <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
                 @foreach (var text in node.Text)
                 {
@@ -39,7 +40,7 @@
                         <RadzenTextBox Style="width:300px" @bind-Value=choice.Text />
                         <RadzenDropDown @bind-Value=choice.DialogNode Data=Tree.Nodes.Except([node]) AllowClear="false">
                             <Template>
-                                @context.Identifier
+                                @(!string.IsNullOrEmpty(context.Name) ? context.Name : context.Identifier)
                             </Template>
                         </RadzenDropDown>
                     </div>
