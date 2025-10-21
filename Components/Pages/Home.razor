@@ -1,0 +1,136 @@
+﻿@page "/"
+@using System.Text.Json
+
+@inject DialogService DialogService
+@inject IWebHostEnvironment IWebHostEnvironment
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<style>
+    .upload {
+        background-color: lightgray;
+        height: 56px;
+        width:143px !important;
+    }
+
+    .upload div {
+        background-color: lightgray;
+        padding: 0;
+        height: 100%;
+    }
+
+    .upload div span span {
+        vertical-align:  middle !important;
+        align-self: center !important;
+        position:absolute;
+        top:35%;
+        font-size: 0.875rem!important;
+        left:15%;
+    }
+
+    .upload div span {
+        background-color: var(--rz-primary) !important;
+        color: white !important;
+        height: 100% !important;
+        width:100% !important;
+    }
+
+    .upload input {
+        width: 100%;
+        position: relative;
+    }
+</style>
+
+<PageTitle>Home</PageTitle>
+<div style="margin: 2rem 0 2rem 2rem;padding-top:1rem;background:none">
+
+    <RadzenStack Orientation="Orientation.Horizontal" Style="margin-bottom:2rem">
+        <h1>Dialog Creator</h1>
+        <RadzenButton Text="Speakers" Click="OpenSpeakerDialog" />
+        <RadzenUpload class="upload" ChooseText="Import json" Url="uploadjson" Accept=".json" Auto="true" Multiple="false" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })"
+                      Style="width: 10%" Complete=@((callback) => ImportJsonFile(callback.RawResponse.Split(":")[1].TrimEnd('}').Trim('"')))>
+        </RadzenUpload>
+        <RadzenButton Text="Download JSON" Click="DownloadJsonFile" />
+        <RadzenButton Text="Download translation file" Click="DownloadTranslationFile" />
+    </RadzenStack>
+
+    <RadzenStack Gap="2rem">
+        @foreach (var tree in Trees)
+        {
+            <DialogTreeComponent Speakers="Speakers" Tree="tree" Home="this" />
+        }
+        <RadzenCard Style="width:180px">
+            <RadzenButton Text="+" Style="width:150px;height:150px;font-size:80px;background-color:rgba(0, 0, 0, 0.2);border-radius:5px;border-color:gray;border-style:dashed" Click="AddNewTree" />
+        </RadzenCard>
+    </RadzenStack>
+
+</div>
+
+
+@code {
+    public List<DialogSpeaker> Speakers { get; set; } = new() { new() { Name = "Rosa" } };
+
+    public List<DialogTree> Trees { get; set; } = [new DialogTree() { Nodes = new List<DialogNode>() { new DialogNode() } }];
+
+    public void OpenSpeakerDialog()
+    {
+        DialogService.Open("Speakers", ds =>
+        @<div>
+            <RadzenStack>
+                <RadzenTextBox ReadOnly=true Value="Rosa" Disabled=true />
+                @foreach (var speaker in Speakers.Except([Speakers.First()]))
+                {
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenTextBox @bind-Value="@speaker.Name" />
+                        <RadzenButton Icon="delete" Click=@(() => { Speakers.Remove(speaker); DialogService.Refresh(); Trees.ForEach(tree => tree.Nodes.ForEach(node => node.Text.ForEach(text => text.Speaker = text.Speaker == speaker ? text.Speaker = Speakers.First() : text.Speaker))); StateHasChanged(); }) />
+                    </RadzenStack>
+                }
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton Text="Add speaker" Click="AddSpeaker" />
+            <RadzenButton Text="Close" Click=@(() => DialogService.Close()) />
+        </RadzenStack>
+    </RadzenStack>
+</div>
+    , new() { CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+    }
+
+    public void AddNewTree() => Trees.Add(new());
+
+    public void Refresh() => StateHasChanged();
+
+    public void AddSpeaker()
+    {
+        Speakers.Add(new() { Name = "Dougie" });
+        DialogService.Refresh();
+    }
+
+    public void DownloadTranslationFile()
+    {
+        var guid = Guid.NewGuid();
+        var path = Path.Combine(IWebHostEnvironment.WebRootPath, $"{guid.ToString()}.csv");
+        List<string> texts = [.. Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => $"{text.Identifier},{text.Text}")];
+        List<string> choices = [.. Trees.SelectMany<DialogTree, DialogNode>(tree => tree.Nodes).SelectMany<DialogNode, DialogChoice>(node => node.Choices).Select(choice => $"{choice.Identifier},{choice.Text}")];
+        File.WriteAllLines(path, ["keys,en", .. texts, .. choices]);
+        NavigationManager.NavigateTo($"downloadcsv/{guid.ToString()}.csv", true);
+    }
+
+    public void DownloadJsonFile()
+    {
+        var guid = Guid.NewGuid();
+        var path = Path.Combine(IWebHostEnvironment.WebRootPath, $"{guid.ToString()}.json");
+        List<string> texts = [.. Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => $"{text.Identifier},{text.Text}")];
+        List<string> choices = [.. Trees.SelectMany<DialogTree, DialogNode>(tree => tree.Nodes).SelectMany<DialogNode, DialogChoice>(node => node.Choices).Select(choice => $"{choice.Identifier},{choice.Text}")];
+        var text = JsonSerializer.Serialize<List<DialogTree>>(Trees, new JsonSerializerOptions() { WriteIndented = true });
+        File.WriteAllText(path, text);
+        NavigationManager.NavigateTo($"downloadjson/{guid.ToString()}.json", true);
+    }
+
+    public void ImportJsonFile(string fileName)
+    {
+        var path = Path.Combine(IWebHostEnvironment.WebRootPath, $"{fileName}.json");
+        Trees = JsonSerializer.Deserialize<List<DialogTree>>(File.ReadAllText(path))!;
+        Speakers = Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => text.Speaker).ToHashSet().ToList();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,78 @@
+﻿@using DialogCreator.Components.Pages
+@rendermode InteractiveServer
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <RadzenTextBox @bind-Value=Tree.Title Style="height:50px;width:400px;margin-bottom:-2rem;font-weight:bold;font-size:25px" TextStyle="TextStyle.H4" Placeholder="Title" />
+    <RadzenButton Icon="delete" Style="height:50px;width:50px" Click="@(() => { Home.Trees.Remove(Tree); Home.Refresh(); })" />
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Style="overflow:auto">
+    @foreach (var node in Tree.Nodes)
+    {
+        <RadzenCard @key=node.Identifier Style="min-width:560px">
+            <RadzenStack Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.End">
+                <RadzenText TextStyle="TextStyle.H4" Text="Text" />
+                <RadzenStack Gap="0" AlignItems="AlignItems.End">
+                    <RadzenText Style="margin:0" TextStyle="TextStyle.Subtitle2" Text="Id:" />
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Text="@node.Identifier" />
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                @foreach (var text in node.Text)
+                {
+                    <div>
+                        <RadzenDropDown @bind-Value=text.Speaker Data=Speakers AllowClear="false">
+                            <Template>
+                                @context.Name
+                            </Template>
+                        </RadzenDropDown>
+                        <RadzenTextBox Style="width:300px" @bind-Value=text.Text />
+                    </div>
+                }
+                <RadzenButton Text="Add new text" Click=@(() => AddNewText(node)) />
+            </RadzenStack>
+            <hr />
+            <RadzenText TextStyle="TextStyle.H4" Text="Choices" />
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                @foreach (var choice in node.Choices)
+                {
+                    <div>
+                        <RadzenTextBox Style="width:300px" @bind-Value=choice.Text />
+                        <RadzenDropDown @bind-Value=choice.DialogNode Data=Tree.Nodes.Except([node]) AllowClear="false">
+                            <Template>
+                                @context.Identifier
+                            </Template>
+                        </RadzenDropDown>
+                    </div>
+                }
+                <RadzenButton Text="Add new choice" Click=@(() => AddNewChoice(node)) />
+            <RadzenButton Text="Delete node" Click=@(() => { Tree.Nodes.Remove(node); Tree.Nodes.ForEach(other => other.Choices.ForEach(choice => choice.DialogNode = choice.DialogNode == node ? null : choice.DialogNode));  StateHasChanged();}) />
+            </RadzenStack>
+        </RadzenCard>
+    }
+    <RadzenCard>
+        <RadzenButton Text="+" Style="min-height:200px;width:200px;height:100%;font-size:80px;background-color:rgba(0, 0, 0, 0.2);border-radius:5px;border-color:gray;border-style:dashed" Click="AddNewNode" />
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public required List<DialogSpeaker> Speakers { get; set; }
+
+    [Parameter]
+    public required DialogTree Tree { get; set; }
+
+    [Parameter]
+    public required Home Home { get; set; }
+
+
+    public void AddNewText(DialogNode node)
+        => node.Text.Add(new() { Text = string.Empty, Speaker = Speakers.First() });
+
+
+    public void AddNewChoice(DialogNode node)
+        => node.Choices.Add(new() { Text = string.Empty });
+
+    public void AddNewNode()
+        => Tree.Nodes.Add(new());
+}

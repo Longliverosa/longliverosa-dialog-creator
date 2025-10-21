@@ -1,0 +1,96 @@
+[
+  {
+    "Title": "",
+    "Identifier": "HKKJCSHZ",
+    "Nodes": [
+      {
+        "Identifier": "59A3JYA2",
+        "Text": [
+          {
+            "Identifier": "0YKPSDW5",
+            "Text": "Welcome to our village",
+            "Speaker": {
+              "Name": "Rosa"
+            }
+          },
+          {
+            "Identifier": "1A0F5R42",
+            "Text": "Wow this looks so cool",
+            "Speaker": {
+              "Name": "Pip"
+            }
+          },
+          {
+            "Identifier": "0LTW0FWX",
+            "Text": "Where would you like to go?",
+            "Speaker": {
+              "Name": "Rosa"
+            }
+          }
+        ],
+        "Choices": [
+          {
+            "Identifier": "WB01ZUWR",
+            "DialogNode": {
+              "Identifier": "YYDB7AOP",
+              "Text": [
+                {
+                  "Identifier": "26ZXXMFK",
+                  "Text": "This is a nice bakery",
+                  "Speaker": {
+                    "Name": "Rosa"
+                  }
+                }
+              ],
+              "Choices": []
+            },
+            "Text": "Bakery"
+          },
+          {
+            "Identifier": "YSRT6LP7",
+            "DialogNode": {
+              "Identifier": "1O8F7XG9",
+              "Text": [
+                {
+                  "Identifier": "CI21RKGI",
+                  "Text": "So much other stuff?",
+                  "Speaker": {
+                    "Name": "Rosa"
+                  }
+                }
+              ],
+              "Choices": []
+            },
+            "Text": "Other stuff"
+          }
+        ]
+      },
+      {
+        "Identifier": "YYDB7AOP",
+        "Text": [
+          {
+            "Identifier": "26ZXXMFK",
+            "Text": "This is a nice bakery",
+            "Speaker": {
+              "Name": "Rosa"
+            }
+          }
+        ],
+        "Choices": []
+      },
+      {
+        "Identifier": "1O8F7XG9",
+        "Text": [
+          {
+            "Identifier": "CI21RKGI",
+            "Text": "So much other stuff?",
+            "Speaker": {
+              "Name": "Rosa"
+            }
+          }
+        ],
+        "Choices": []
+      }
+    ]
+  }
+]
