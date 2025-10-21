@@ -101,7 +101,7 @@
     , new() { CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
     }
 
-    public void AddNewTree() => Trees.Add(new(Utilities.GetRandomIdentifier()));
+    public void AddNewTree() => Trees.Add(new(Utilities.GetRandomIdentifier()) { Nodes = [new(Utilities.GetRandomIdentifier())]});
 
     public void Refresh() => StateHasChanged();
 
