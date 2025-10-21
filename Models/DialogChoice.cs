@@ -7,7 +7,13 @@ namespace DialogCreator.Models
         public string Identifier { get; set; } = identifier;
         [JsonIgnore]
         public DialogNode? DialogNode { get; set; } = null;
-        public string? DialogNodeId => DialogNode?.Identifier;
+
+        private string? dialogNodeId;
+        public string? DialogNodeId
+        {
+            get => DialogNode?.Identifier ?? dialogNodeId;
+            set => dialogNodeId = value;
+        }
         public string Text { get; set; } = string.Empty;
     }
 }

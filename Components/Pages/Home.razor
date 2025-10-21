@@ -139,6 +139,7 @@
         Speakers = Trees.SelectMany<DialogTree, DialogText>(tree => tree.Nodes.SelectMany<DialogNode, DialogText>(node => node.Text)).Select(text => text.Speaker).ToHashSet().ToList();
         File.Delete(path);
         ReadAllIdentifiers();
+        Trees.ForEach(tree => tree.Nodes.ForEach(node => node.Choices.ForEach(choice => choice.DialogNode = tree.Nodes.FirstOrDefault(n => n.Identifier == choice.DialogNodeId ))));
         StateHasChanged();
     }
 
